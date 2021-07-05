@@ -1,0 +1,3 @@
+[submodule "modules/uefi"]
+	path = modules/uefi
+	url = https://github.com/fishjump/posix-uefi.git

@@ -1,0 +1,66 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="check-env" DefaultTargets="build" ToolsVersion="16.0">
+
+    <!-- Project -->
+    <PropertyGroup>
+        <IncludePath>$(MSBuildProjectDirectory)/includes</IncludePath>
+        <SourcePath>$(MSBuildProjectDirectory)/src</SourcePath>
+        <ModulePath>$(MSBuildStartupDirectory)/modules</ModulePath>
+        <BuildPath>$(MSBuildStartupDirectory)/build/$(MSBuildProjectName)</BuildPath>
+        <TargetObject>$(BuildPath)/bootx64.efi</TargetObject>
+        <GCC>/usr/bin/gcc</GCC>
+        <LD>/usr/bin/ld</LD>
+        <OBC>/usr/bin/objcopy</OBC>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Include -->
+        <Include Include="$(IncludePath)" />
+        <Include Include="$(SourcePath)" />
+        <Include Include="$(ModulePath)/uefi/includes" />
+
+        <!-- Libs -->
+        <Lib Include="$(ModulePath)/uefi/libs/crt0.o" />
+        <Lib Include="$(ModulePath)/uefi/libs/libuefi.a" />
+
+        <!-- Sources -->
+        <Source Include="$(SourcePath)/**/*.c">
+            <Object>$(BuildPath)/%(RecursiveDir)%(Filename).o</Object>
+        </Source>
+    </ItemGroup>
+
+    <!-- Files -->
+    <PropertyGroup>
+        <LinkScript>$(ModulePath)/uefi/libs/link.ld</LinkScript>
+    </PropertyGroup>
+
+    <!-- Flags -->
+    <PropertyGroup>
+        <CFlags>-D__x86_64__ -DHAVE_USE_MS_ABI -std=c11 @(Include -> '-I %(Identity)', ' ')  -fshort-wchar -fpic -ffreestanding -fno-stack-check -maccumulate-outgoing-args -Wno-builtin-declaration-mismatch -mno-red-zone</CFlags>
+        <LdFlags>-nostdlib -T $(LinkScript) -shared -Bsymbolic</LdFlags>
+        <OBCFlags>-j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela  -j .reloc -O efi-app-x86_64</OBCFlags>
+    </PropertyGroup>
+
+    <!-- Targets -->
+    <Target Name="build">
+        <Message Text="Building $(MSBuildProjectName)." />
+        <Message Text="%(Source.Identity) " />
+        <Exec Command="$(GCC) -c %(Source.Identity) -o %(Source.Object) $(CFlags)" EchoOff="true" />
+        <Exec Command="$(LD) @(Source -> '%(Object)', ' ') @(Lib, ' ') -o $(BuildPath)/bootx64.so $(LdFlags)" EchoOff="true" />
+        <Exec Command="$(OBC) $(BuildPath)/bootx64.so $(TargetObject) $(OBCFlags)" EchoOff="true" />
+    </Target>
+
+    <!-- Clean Files -->
+    <Target Name="clean">
+        <Message Text="Cleaning $(MSBuildProjectName)." />
+        <Delete Files="%(Source.Object)" />
+        <Delete Files="$(TargetObject)" />
+        <Delete Files="$(BuildPath)/bootx64.so" />
+    </Target>
+
+    <!-- Create necessary files -->
+    <Target Name="check-env">
+        <MakeDir Directories="$(BuildPath)" />
+        <MakeDir Directories="@(Source -> '$(BuildPath)/%(RecursiveDir)')" />
+    </Target>
+
+</Project>

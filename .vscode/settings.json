@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "bootparam.h": "c",
+        "elf.h": "c",
+        "uefi.h": "c"
+    }
+}
