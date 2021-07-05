@@ -1,10 +1,10 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="check-env" DefaultTargets="build" ToolsVersion="16.0">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="pre-build" DefaultTargets="build" ToolsVersion="16.0">
 
     <!-- Project -->
     <PropertyGroup>
         <IncludePath>$(MSBuildProjectDirectory)/includes</IncludePath>
         <SourcePath>$(MSBuildProjectDirectory)/src</SourcePath>
-        <ModulePath>$(MSBuildStartupDirectory)/modules</ModulePath>
+        <ModulePath>$(MSBuildProjectDirectory)/modules</ModulePath>
         <BuildPath>$(MSBuildStartupDirectory)/build/$(MSBuildProjectName)</BuildPath>
         <TargetObject>$(BuildPath)/bootx64.efi</TargetObject>
         <GCC>/usr/bin/gcc</GCC>
@@ -58,7 +58,7 @@
     </Target>
 
     <!-- Create necessary files -->
-    <Target Name="check-env">
+    <Target Name="pre-build">
         <MakeDir Directories="$(BuildPath)" />
         <MakeDir Directories="@(Source -> '$(BuildPath)/%(RecursiveDir)')" />
     </Target>
