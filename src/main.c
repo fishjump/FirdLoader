@@ -87,12 +87,12 @@ int main(int argc, char **argv) {
     bootp.memory_map.base            = memory_map;
     bootp.memory_map.memory_map_size = memory_map_size;
     bootp.memory_map.desc_size       = desc_size;
-    bootp.framebuffer.base  = (unsigned int *)gop->Mode->FrameBufferBase;
+    bootp.framebuffer.base  = (uint32_t *)gop->Mode->FrameBufferBase;
     bootp.framebuffer.width = gop->Mode->Information->HorizontalResolution;
     bootp.framebuffer.height = gop->Mode->Information->VerticalResolution;
     bootp.framebuffer.pixel_per_scan_line =
-        sizeof(unsigned int) * gop->Mode->Information->PixelsPerScanLine;
-
+        gop->Mode->Information->PixelsPerScanLine;
+ 
     // exit this UEFI bullshit
     if(exit_bs()) {
         printf("Ph'nglui mglw'nafh Chtulu R'lyeh wgah'nagl fhtagn\n"
