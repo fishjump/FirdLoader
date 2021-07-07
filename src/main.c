@@ -69,9 +69,6 @@ int main(int argc, char **argv) {
     }
     gop->SetMode(gop, mode_of_max_resolution);
 
-    // free resources
-    free_kernel(buffer);
-
     // get the memory map
     efi_memory_descriptor_t *memory_map;
     uintn_t                  memory_map_size = 0, desc_size = 0;
@@ -83,16 +80,31 @@ int main(int argc, char **argv) {
     bootparam_t bootp;
     memset(&bootp, 0, sizeof(bootparam_t));
     parse_args(&bootp, argc, argv);
-    bootp.psf1_font                  = psf1_font;
-    bootp.memory_map.base            = memory_map;
-    bootp.memory_map.memory_map_size = memory_map_size;
-    bootp.memory_map.desc_size       = desc_size;
+    bootp.psf1_font         = psf1_font;
     bootp.framebuffer.base  = (uint32_t *)gop->Mode->FrameBufferBase;
     bootp.framebuffer.width = gop->Mode->Information->HorizontalResolution;
     bootp.framebuffer.height = gop->Mode->Information->VerticalResolution;
     bootp.framebuffer.pixel_per_scan_line =
         gop->Mode->Information->PixelsPerScanLine;
- 
+    bootp.memory_map.memory_map_size = memory_map_size / desc_size;
+    bootp.memory_map.base = malloc(bootp.memory_map.memory_map_size
+                                   * sizeof(memory_descriptor_t));
+    for(int i = 0; i < bootp.memory_map.memory_map_size; i++) {
+        efi_memory_descriptor_t *desc =
+            (efi_memory_descriptor_t *)((uint8_t *)memory_map
+                                        + i * desc_size);
+        bootp.memory_map.base[i].type  = desc->Type;
+        bootp.memory_map.base[i].pad   = desc->Pad;
+        bootp.memory_map.base[i].paddr = (void *)desc->PhysicalStart;
+        bootp.memory_map.base[i].vaddr = (void *)desc->VirtualStart;
+        bootp.memory_map.base[i].num_of_pages = desc->NumberOfPages;
+        bootp.memory_map.base[i].attribute    = desc->Attribute;
+    }
+
+    // free resources
+    free_kernel(buffer);
+    free_memory_map(memory_map);
+
     // exit this UEFI bullshit
     if(exit_bs()) {
         printf("Ph'nglui mglw'nafh Chtulu R'lyeh wgah'nagl fhtagn\n"

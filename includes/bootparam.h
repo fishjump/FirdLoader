@@ -1,6 +1,14 @@
 #pragma once
 
-#include <uefi.h>
+typedef char              int8_t;
+typedef unsigned char     uint8_t;
+typedef short             int16_t;
+typedef unsigned short    uint16_t;
+typedef int               int32_t;
+typedef unsigned int      uint32_t;
+typedef long int          int64_t;
+typedef unsigned long int uint64_t;
+typedef unsigned long int uintptr_t;
 
 typedef struct {
     uint8_t magic[2]; // Magic number
@@ -21,9 +29,17 @@ typedef struct {
 } framebuffer_t;
 
 typedef struct {
-    efi_memory_descriptor_t *base;
-    uint64_t                 memory_map_size;
-    uint64_t                 desc_size;
+    uint32_t type;
+    uint32_t pad;
+    void *   paddr;
+    void *   vaddr;
+    uint64_t num_of_pages;
+    uint64_t attribute;
+} memory_descriptor_t;
+
+typedef struct {
+    memory_descriptor_t *base;
+    uint64_t             memory_map_size;
 } memory_map_t;
 
 typedef struct {
