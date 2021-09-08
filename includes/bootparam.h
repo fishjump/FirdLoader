@@ -10,6 +10,23 @@ typedef long int          int64_t;
 typedef unsigned long int uint64_t;
 typedef unsigned long int uintptr_t;
 
+typedef enum {
+    efi_reserved_memory_type,
+    efi_loader_code,
+    efi_loader_data,
+    efi_boot_services_code,
+    efi_boot_services_data,
+    efi_runtime_services_code,
+    efi_runtime_services_data,
+    efi_conventional_memory,
+    efi_unusable_memory,
+    efi_ACPI_reclaim_memory,
+    efi_ACPI_memory_NVS,
+    efi_memory_mapped_IO,
+    efi_memory_mapped_IO_port_space,
+    efi_pal_code
+} memory_type_t;
+
 typedef struct {
     uint8_t magic[2]; // Magic number
     uint8_t mode;     // PSF font mode

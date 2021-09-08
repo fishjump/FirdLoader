@@ -5,9 +5,6 @@
 
 typedef void (*__attribute__((sysv_abi)) kernel_entry_t)(bootparam_t *);
 
-/**
- * Load an ELF executable and pass control over for good
- */
 int main(int argc, char **argv) {
     // load the kernel
     char *buffer = NULL;
