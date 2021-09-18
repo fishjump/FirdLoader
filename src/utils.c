@@ -148,29 +148,22 @@ int load_font(const char *file, psf1_font_t *pointer_of_font) {
     long size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    pointer_of_font->psf1_header = malloc(sizeof(psf1_header_t));
-    if(!pointer_of_font->psf1_header) {
-        printf("Unable to allocate memory\n");
-        return 1;
-    }
-    fread(pointer_of_font->psf1_header, sizeof(psf1_header_t), 1, f);
+    fread(&pointer_of_font->psf1_header, sizeof(psf1_header_t), 1, f);
 
-    if(memcmp(pointer_of_font->psf1_header->magic, PSF1_MAG,
+    if(memcmp(pointer_of_font->psf1_header.magic, PSF1_MAG,
               PSF1_MAG_LEN)) {
         printf("not a valid PSF file, reason: wrong magic number\n");
         return 1;
     }
 
     uint32_t glyph_buffer_size =
-        (pointer_of_font->psf1_header->mode & PSF1_MODE512 == 0 ? 256
-                                                                : 512)
-        * pointer_of_font->psf1_header->charsize;
+        (pointer_of_font->psf1_header.mode & PSF1_MODE512 == 0 ? 256 : 512)
+        * pointer_of_font->psf1_header.charsize;
     if(size < sizeof(psf1_header_t) + glyph_buffer_size) {
         printf("not a valid PSF file, reason: header and data size is out "
                "of file size\n");
         return 1;
     }
-    pointer_of_font->glyph_buffer = malloc(glyph_buffer_size);
     fread(pointer_of_font->glyph_buffer, glyph_buffer_size, 1, f);
 
     fclose(f);
@@ -178,6 +171,6 @@ int load_font(const char *file, psf1_font_t *pointer_of_font) {
 }
 
 void free_font(psf1_font_t font) {
-    free(font.psf1_header);
-    free(font.glyph_buffer);
+    free(&font.psf1_header);
+    free(&font.glyph_buffer);
 }

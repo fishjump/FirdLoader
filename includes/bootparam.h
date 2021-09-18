@@ -34,8 +34,8 @@ typedef struct {
 } psf1_header_t;
 
 typedef struct {
-    psf1_header_t *psf1_header;
-    void *         glyph_buffer;
+    psf1_header_t psf1_header;
+    char          glyph_buffer[512 * 16];
 } psf1_font_t;
 
 typedef struct {
